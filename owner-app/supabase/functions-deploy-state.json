@@ -1,0 +1,13 @@
+{
+  "projectId": "73084905",
+  "functions": {
+    "create-staff-user": {
+      "hasChanged": false,
+      "hash": "b88f9708b1d8560bbf9ddd90c8074e9456757fd228352aa492ce98e31449426c"
+    },
+    "signup-owner": {
+      "hasChanged": false,
+      "hash": "10c2e208ba0d4b796f70dbc156ae47fe75b94234a00eb197a42804b634a155e5"
+    }
+  }
+}

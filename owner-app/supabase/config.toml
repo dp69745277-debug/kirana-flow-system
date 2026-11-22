@@ -1,0 +1,7 @@
+project_id = "kirana-store-app"
+
+[functions.signup-owner]
+verify_jwt = false
+
+[functions.create-staff-user]
+verify_jwt = true
