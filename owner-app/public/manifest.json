@@ -1,0 +1,22 @@
+{
+  "name": "Kirana Store",
+  "short_name": "Kirana Store",
+  "description": "Smart godown inventory, wholesale orders, delivery billing, and digital khata for Indian Kirana stores.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F7F8F7",
+  "theme_color": "#059669",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
