@@ -1,16 +1,24 @@
 {
-  "short_name": "Kirana B2B",
-  "name": "Kirana B2B Wholesale Customer App",
+  "name": "Kirana Customer",
+  "short_name": "Kirana Customer",
+  "description": "Order wholesale Kirana stock online, choose self-pickup or staff delivery, track orders live, and check your digital khata passbook.",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#059669",
+  "background_color": "#F7F8F7",
+  "orientation": "portrait",
   "icons": [
     {
-      "src": "/logo.svg",
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "512x512",
       "type": "image/svg+xml",
-      "sizes": "192x192 512x512"
+      "purpose": "any maskable"
     }
-  ],
-  "start_url": "/",
-  "background_color": "#f8fafc",
-  "theme_color": "#16a34a",
-  "display": "standalone",
-  "orientation": "portrait"
+  ]
 }

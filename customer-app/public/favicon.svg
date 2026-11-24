@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#047857"/>
+    </linearGradient>
+    <linearGradient id="basketGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f0fdf4"/>
+    </linearGradient>
+    <filter id="dropShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#064e3b" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Background rounded card -->
+  <rect width="512" height="512" rx="116" fill="url(#bgGrad)"/>
+  
+  <!-- Subtle inner border -->
+  <rect x="8" y="8" width="496" height="496" rx="108" fill="none" stroke="#ffffff" stroke-width="4" stroke-opacity="0.2"/>
+
+  <!-- Main Shopping / Wholesale Basket Group with Shadow -->
+  <g filter="url(#dropShadow)">
+    <!-- Basket Handle -->
+    <path d="M192 184 C 192 110, 320 110, 320 184" fill="none" stroke="#ffffff" stroke-width="26" stroke-linecap="round"/>
+
+    <!-- Basket Body -->
+    <path d="M120 184 L392 184 C402 184 410 193 408 203 L372 362 C370 371 362 378 352 378 L160 378 C150 378 142 371 140 362 L104 203 C102 193 110 184 120 184 Z" 
+          fill="url(#basketGrad)"/>
+
+    <!-- Basket Grid Lines / Slots (Modern Store Crate Styling) -->
+    <path d="M174 220 L188 344" stroke="#059669" stroke-width="12" stroke-linecap="round"/>
+    <path d="M256 220 L256 344" stroke="#059669" stroke-width="12" stroke-linecap="round"/>
+    <path d="M338 220 L324 344" stroke="#059669" stroke-width="12" stroke-linecap="round"/>
+    <line x1="136" y1="278" x2="376" y2="278" stroke="#059669" stroke-width="12" stroke-linecap="round"/>
+
+    <!-- Wholesale Wheels -->
+    <circle cx="196" cy="424" r="26" fill="#ffffff"/>
+    <circle cx="196" cy="424" r="12" fill="#047857"/>
+    <circle cx="316" cy="424" r="26" fill="#ffffff"/>
+    <circle cx="316" cy="424" r="12" fill="#047857"/>
+
+    <!-- Small Sparkle / Star on top right of basket -->
+    <path d="M394 136 Q 404 150 418 160 Q 404 170 394 184 Q 384 170 370 160 Q 384 150 394 136 Z" fill="#fef08a"/>
+  </g>
+</svg>
