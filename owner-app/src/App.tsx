@@ -23,7 +23,14 @@ function Router() {
 
   if (loading) return <div className="min-h-screen bg-slate-50 flex items-center justify-center"><Spinner label="Loading…" /></div>;
   if (!session) return <AuthScreen />;
-  if (store && !store.is_active) return <SuspendedScreen />;
+  const isBlockedOrExpired = store && (
+    !store.is_active ||
+    store.subscription_status === 'expired' ||
+    store.subscription_status === 'suspended' ||
+    (store.subscription_status === 'trial' && store.trial_ends_at && new Date(store.trial_ends_at).getTime() < Date.now()) ||
+    (store.subscription_status === 'active' && store.subscription_ends_at && new Date(store.subscription_ends_at).getTime() < Date.now())
+  );
+  if (isBlockedOrExpired) return <SuspendedScreen />;
   if (!store) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">

@@ -18,6 +18,13 @@ export interface Store {
   dead_stock_days: number;
   language: Lang;
   created_at: string;
+  plan_name?: string;
+  subscription_status?: string;
+  trial_ends_at?: string;
+  subscription_ends_at?: string | null;
+  custom_plan_price?: number;
+  billing_cycle?: string;
+  admin_notes?: string | null;
 }
 
 export interface WholesaleCustomer {
