@@ -214,23 +214,23 @@ export default function Shell({ page, setPage, children }: { page: PageKey; setP
 
       {/* Header */}
       <header className="lg:pl-60 sticky top-0 z-20 bg-white/95 backdrop-blur border-b border-slate-200">
-        <div className="flex items-center gap-2 px-4 py-3">
-          <button className="lg:hidden p-2 -ml-2 text-slate-600" onClick={() => setDrawer(true)}>
-            <Menu size={22} />
+        <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2.5 sm:py-3">
+          <button className="lg:hidden p-1.5 sm:p-2 -ml-1 sm:-ml-2 text-slate-600 dark:text-slate-300" onClick={() => setDrawer(true)}>
+            <Menu size={20} className="sm:w-[22px] sm:h-[22px]" />
           </button>
-          <div className="min-w-0 flex-1">
-            <h1 className="text-base font-semibold text-slate-900 truncate">{t(page === 'dashboard' ? 'dashboard' : page, lang)}</h1>
-            <p className="text-xs text-slate-400 truncate">
+          <div className="min-w-0 flex-1 mr-1">
+            <h1 className="text-sm sm:text-base font-semibold text-slate-900 truncate">{t(page === 'dashboard' ? 'dashboard' : page, lang)}</h1>
+            <p className="text-[11px] sm:text-xs text-slate-400 truncate">
               {user.name} · {user.role === 'owner' ? 'Owner' : 'Staff'}
             </p>
           </div>
 
           {/* Low stock bell */}
           <div className="relative">
-            <button onClick={() => { setShowLowStock(!showLowStock); setShowPrice(false); }} className="relative p-2 rounded-lg hover:bg-slate-100 text-slate-600">
-              <Bell size={20} />
+            <button onClick={() => { setShowLowStock(!showLowStock); setShowPrice(false); }} className="relative p-1.5 sm:p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300">
+              <Bell size={18} className="sm:w-5 sm:h-5" />
               {lowStockItems.length > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 bg-amber-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                <span className="absolute -top-0.5 -right-0.5 bg-amber-500 text-white text-[9px] sm:text-[10px] font-bold rounded-full min-w-[16px] sm:min-w-[18px] h-[16px] sm:h-[18px] flex items-center justify-center px-1">
                   {lowStockItems.length}
                 </span>
               )}
@@ -258,10 +258,10 @@ export default function Shell({ page, setPage, children }: { page: PageKey; setP
 
           {/* Price fluctuation */}
           <div className="relative">
-            <button onClick={() => { setShowPrice(!showPrice); setShowLowStock(false); }} className="relative p-2 rounded-lg hover:bg-slate-100 text-slate-600">
-              <IndianRupee size={20} />
+            <button onClick={() => { setShowPrice(!showPrice); setShowLowStock(false); }} className="relative p-1.5 sm:p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300">
+              <IndianRupee size={18} className="sm:w-5 sm:h-5" />
               {priceAlerts.length > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[9px] sm:text-[10px] font-bold rounded-full min-w-[16px] sm:min-w-[18px] h-[16px] sm:h-[18px] flex items-center justify-center px-1">
                   {priceAlerts.length}
                 </span>
               )}
@@ -290,10 +290,10 @@ export default function Shell({ page, setPage, children }: { page: PageKey; setP
           {/* Pending hisaab (owner) */}
           {isOwner && (
             <div className="relative">
-              <button onClick={() => { setShowPending(!showPending); setShowLowStock(false); setShowPrice(false); setPage('agencies'); }} className="relative p-2 rounded-lg hover:bg-slate-100 text-slate-600">
-                <Inbox size={20} />
+              <button onClick={() => { setShowPending(!showPending); setShowLowStock(false); setShowPrice(false); setPage('agencies'); }} className="relative p-1.5 sm:p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300">
+                <Inbox size={18} className="sm:w-5 sm:h-5" />
                 {pendingCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 bg-teal-600 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                  <span className="absolute -top-0.5 -right-0.5 bg-teal-600 text-white text-[9px] sm:text-[10px] font-bold rounded-full min-w-[16px] sm:min-w-[18px] h-[16px] sm:h-[18px] flex items-center justify-center px-1">
                     {pendingCount}
                   </span>
                 )}
@@ -306,9 +306,9 @@ export default function Shell({ page, setPage, children }: { page: PageKey; setP
             onClick={handleSoundToggle}
             title={soundMuted ? 'Unmute Sound' : 'Mute Sound'}
             aria-label={soundMuted ? 'Unmute Sound' : 'Mute Sound'}
-            className="relative p-2 rounded-lg hover:bg-slate-100 text-slate-600 transition-colors"
+            className="relative p-1.5 sm:p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors"
           >
-            {soundMuted ? <VolumeX size={20} className="text-slate-400" /> : <Volume2 size={20} className="text-emerald-600" />}
+            {soundMuted ? <VolumeX size={18} className="sm:w-5 sm:h-5 text-slate-400" /> : <Volume2 size={18} className="sm:w-5 sm:h-5 text-emerald-600" />}
           </button>
 
           {/* Theme toggle (Light <-> Dark mode with circular wipe) */}
@@ -316,18 +316,18 @@ export default function Shell({ page, setPage, children }: { page: PageKey; setP
             onClick={handleThemeToggle}
             title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
             aria-label={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-            className="relative p-2 rounded-lg hover:bg-slate-100 text-slate-600 transition-colors"
+            className="relative p-1.5 sm:p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors"
           >
-            {isDark ? <Sun size={20} className="text-amber-400" /> : <Moon size={20} />}
+            {isDark ? <Sun size={18} className="sm:w-5 sm:h-5 text-amber-400" /> : <Moon size={18} className="sm:w-5 sm:h-5" />}
           </button>
 
           {/* Language switcher */}
-          <div className="flex rounded-lg border border-slate-200 overflow-hidden shrink-0">
+          <div className="flex rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden shrink-0">
             {(['en', 'hinglish', 'hi'] as const).map((l) => (
               <button
                 key={l}
                 onClick={() => setLang(l)}
-                className={cn('px-2 py-1.5 text-xs font-medium transition-colors', lang === l ? 'bg-emerald-600 text-white' : 'bg-white text-slate-500 hover:bg-slate-50')}
+                className={cn('px-1.5 sm:px-2 py-1 sm:py-1.5 text-[11px] sm:text-xs font-medium transition-colors', lang === l ? 'bg-emerald-600 text-white' : 'bg-white text-slate-500 hover:bg-slate-50')}
               >
                 {l === 'en' ? 'EN' : l === 'hinglish' ? 'HiNg' : 'हिं'}
               </button>
@@ -403,8 +403,10 @@ export default function Shell({ page, setPage, children }: { page: PageKey; setP
 function Popover({ children, onClose }: { children: ReactNode; onClose: () => void }) {
   return (
     <>
-      <div className="fixed inset-0 z-40" onMouseDown={onClose} />
-      <Card className="absolute right-0 top-12 z-50 w-80 max-w-[calc(100vw-2rem)] p-4 shadow-xl max-h-96 overflow-y-auto">{children}</Card>
+      <div className="fixed inset-0 z-[80]" onMouseDown={onClose} />
+      <Card className="fixed inset-x-3 top-14 z-[90] w-auto max-h-[70dvh] overflow-y-auto sm:absolute sm:inset-x-auto sm:right-0 sm:top-12 sm:w-80 sm:max-h-96 p-4 shadow-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+        {children}
+      </Card>
     </>
   );
 }

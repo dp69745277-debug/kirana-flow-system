@@ -301,7 +301,7 @@ export default function Inventory() {
 
       {/* Add/Edit item */}
       <Modal open={itemModal} onClose={() => setItemModal(false)} title={editing ? 'Edit Item' : 'Add Item'} wide>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="col-span-2 sm:col-span-1">
             <Label required>Item Name</Label>
             <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />

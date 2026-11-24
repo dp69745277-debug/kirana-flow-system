@@ -268,12 +268,12 @@ export default function Customers() {
 
       {/* Add customer */}
       <Modal open={addModal} onClose={() => setAddModal(false)} title="Add Wholesale Customer" wide>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div><Label required>Customer Name</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
           <div><Label required>Customer Shop Name</Label><Input value={form.shop_name} onChange={(e) => setForm({ ...form, shop_name: e.target.value })} /></div>
           <div><Label required>Mobile Number</Label><Input inputMode="numeric" maxLength={10} value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value.replace(/\D/g, '') })} /></div>
           <div><Label required>Password (Customer App login)</Label><Input type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} /></div>
-          <div className="col-span-2"><Label>Shop Address</Label><Input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} /></div>
+          <div className="col-span-1 sm:col-span-2"><Label>Shop Address</Label><Input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} /></div>
           <div><Label>Credit Limit (₹, optional)</Label><Input type="number" value={form.credit_limit} onChange={(e) => setForm({ ...form, credit_limit: e.target.value })} /></div>
           <div><Label>Opening Khata Balance (₹)</Label><Input type="number" value={form.opening_balance} onChange={(e) => setForm({ ...form, opening_balance: e.target.value })} /></div>
         </div>

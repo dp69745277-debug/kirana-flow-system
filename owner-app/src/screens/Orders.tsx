@@ -786,7 +786,7 @@ export default function Orders() {
       {/* Manual order */}
       <Modal open={createModal} onClose={() => setCreateModal(false)} title="Create Manual Order" wide>
         <div className="space-y-3">
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <div>
               <Label required>Customer</Label>
               <Select value={newCustomer} onChange={(e) => setNewCustomer(e.target.value)}>

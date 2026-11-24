@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Store as StoreIcon, ChevronLeft, CheckCircle2, Sparkles } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { useApp } from '@/context/AppContext';
 import { Button, Input, Label, Card, cn, useToast, Spinner } from '@/components/ui';
-import type { StoreType } from '@/lib/types';
+import type { Store, StoreType } from '@/lib/types';
 import { seedDemoData } from '@/lib/seed';
 
 const STORE_TYPES: Array<{ value: StoreType; title: string; desc: string; features: string[] }> = [
@@ -30,6 +31,7 @@ export default function AuthScreen({ onBack }: { onBack?: () => void }) {
   const [mode, setMode] = useState<'login' | 'register' | 'storeType'>('login');
   const [busy, setBusy] = useState(false);
   const { show, node: toastNode } = useToast();
+  const { refresh, setStore } = useApp();
 
   // register fields
   const [ownerName, setOwnerName] = useState('');
@@ -49,57 +51,119 @@ export default function AuthScreen({ onBack }: { onBack?: () => void }) {
       return show('Password must contain at least one letter and one number', true);
     }
     if (password !== confirm) return show('Passwords do not match', true);
+
     setBusy(true);
-    const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/signup-owner`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', apikey: import.meta.env.VITE_SUPABASE_ANON_KEY },
-      body: JSON.stringify({ ownerName, shopName, phone, address, password, storeType: 'retail' }),
-    });
-    const body = await res.json();
+    // Pre-check if phone is already registered in stores before advancing to Step 2
+    const { data: existing, error: checkErr } = await supabase
+      .from('stores')
+      .select('id')
+      .eq('phone', phone)
+      .maybeSingle();
     setBusy(false);
-    if (!res.ok) return show(body.error ?? 'Registration failed', true);
-    // Step 1 created store provisionally as retail; update store type now.
-    setStoreType('retail');
+
+    if (checkErr && checkErr.code !== 'PGRST116') {
+      console.warn('Check error:', checkErr);
+    }
+    if (existing) {
+      return show('This mobile number is already registered. Please login.', true);
+    }
+
+    // Advance to Step 2 WITHOUT inserting any premature 'retail' row into stores
     setMode('storeType');
   }
 
   async function handleChooseStoreType(type: StoreType, withDemo: boolean) {
+    const cleanType: StoreType = (type.toLowerCase().trim() as StoreType);
+    if (!['retail', 'wholesale', 'mix'].includes(cleanType)) {
+      return show('Invalid store type selected', true);
+    }
+
     setBusy(true);
-    setStoreType(type);
-    // The signup function already signed us in; re-login to get the session client-side.
+    setStoreType(cleanType);
+
+    // Step 1: Create store and owner account directly with chosen storeType
+    const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/signup-owner`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+      },
+      body: JSON.stringify({
+        ownerName: ownerName.trim(),
+        shopName: shopName.trim(),
+        phone: phone.trim(),
+        address: address.trim(),
+        password,
+        storeType: cleanType,
+      }),
+    });
+
+    const body = await res.json();
+    if (!res.ok) {
+      setBusy(false);
+      return show(body.error ?? 'Registration failed', true);
+    }
+
+    // Step 2: Sign in client-side to obtain session
     const email = `${phone}@kirana.app`;
     const { error: loginErr } = await supabase.auth.signInWithPassword({ email, password });
     if (loginErr) {
       setBusy(false);
-      return show(loginErr.message, true);
+      return show(`Account created, but login failed: ${loginErr.message}`, true);
     }
-    const { data: sessionData } = await supabase.auth.getSession();
-    const token = sessionData.session?.access_token;
-    if (!token) {
-      setBusy(false);
-      return show('Session error, please login', true);
+
+    // Step 3: Explicitly update stores table to ensure store_type & feature_flags match with 100% certainty
+    const isWholesale = cleanType === 'wholesale' || cleanType === 'mix';
+    const featureFlags: Record<string, boolean | number> = {
+      retail_module: true,
+      godown_inventory: true,
+      daily_hisaab: true,
+      agencies: true,
+      dead_stock_tracker: true,
+      reports: true,
+      staff_module: true,
+      wholesale_module: isWholesale,
+      wholesale_orders: isWholesale,
+      customer_directory: isWholesale,
+      khata_ledger: isWholesale,
+      whatsapp_reminders: isWholesale,
+      customer_app_accounts: isWholesale,
+      pdf_exports: true,
+      max_staff_limit: 10,
+    };
+
+    const { data: updatedStore, error: updateErr } = await supabase
+      .from('stores')
+      .update({
+        store_type: cleanType,
+        feature_flags: featureFlags,
+      })
+      .eq('phone', phone)
+      .select('*')
+      .single();
+
+    if (updateErr) {
+      console.error('Store type update error:', updateErr);
+      show(`Store created, but setting store type returned: ${updateErr.message}`, true);
     }
-    // Patch store_type + flags via owner-signed request
-    const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/signup-owner`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', apikey: import.meta.env.VITE_SUPABASE_ANON_KEY, Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ storeType: type }),
-    });
-    if (!res.ok) {
-      const body = await res.json();
-      setBusy(false);
-      return show(body.error ?? 'Failed to set store type', true);
-    }
-    setBusy(false);
-    setRegisteredStoreId('ok');
+
+    // Step 4: If demo data was requested, seed it
     if (withDemo) {
-      const { data: srow } = await supabase.from('stores').select('*').maybeSingle();
-      if (srow) {
-        const seeded = await seedDemoData(srow as never);
+      const storeToSeed = updatedStore || (await supabase.from('stores').select('*').eq('phone', phone).maybeSingle()).data;
+      if (storeToSeed) {
+        const seeded = await seedDemoData(storeToSeed as never);
         if (!seeded.ok) show(seeded.error ?? 'Seed failed', true);
       }
     }
-    // Context will pick up the session and route into the app
+
+    // Step 5: Immediately update in-memory store & trigger AuthContext refresh before redirecting
+    if (updatedStore) {
+      setStore(updatedStore as Store);
+    }
+    await refresh();
+
+    setBusy(false);
+    setRegisteredStoreId('ok');
   }
 
   async function handleLogin() {
@@ -209,7 +273,10 @@ export default function AuthScreen({ onBack }: { onBack?: () => void }) {
 
           {mode === 'storeType' && (
             <div>
-              <h2 className="text-lg font-semibold text-slate-900">Business Type</h2>
+              <div className="flex items-center gap-2 mb-3">
+                <button onClick={() => setMode('register')} className="p-1 rounded hover:bg-slate-100"><ChevronLeft size={18} /></button>
+                <h2 className="text-lg font-semibold text-slate-900">Business Type</h2>
+              </div>
               <p className="text-xs text-slate-500 mb-4">Step 2 of 2 — choose how your store works</p>
               <div className="space-y-3">
                 {STORE_TYPES.map((st) => (

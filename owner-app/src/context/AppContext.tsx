@@ -8,6 +8,7 @@ interface AppState {
   loading: boolean;
   session: Session | null;
   store: Store | null;
+  setStore: (s: Store | null) => void;
   user: StoreUser | null;
   lang: Lang;
   setLang: (l: Lang) => void;
@@ -57,6 +58,33 @@ export function AppProvider({ children }: { children: ReactNode }) {
       .select('*')
       .eq('id', userRow.store_id)
       .maybeSingle();
+
+    if (storeRow) {
+      const rawType = (storeRow.store_type ?? 'retail').toString().trim().toLowerCase();
+      storeRow.store_type = (['retail', 'wholesale', 'mix'].includes(rawType) ? rawType : 'retail') as Store['store_type'];
+      const isWholesale = storeRow.store_type === 'wholesale' || storeRow.store_type === 'mix';
+      if (isWholesale) {
+        storeRow.feature_flags = {
+          retail_module: true,
+          godown_inventory: true,
+          daily_hisaab: true,
+          agencies: true,
+          dead_stock_tracker: true,
+          reports: true,
+          staff_module: true,
+          wholesale_module: true,
+          wholesale_orders: true,
+          customer_directory: true,
+          khata_ledger: true,
+          whatsapp_reminders: true,
+          customer_app_accounts: true,
+          pdf_exports: true,
+          max_staff_limit: 10,
+          ...(storeRow.feature_flags ?? {}),
+        };
+      }
+    }
+
     setUser(userRow as StoreUser);
     setStore((storeRow as Store) ?? null);
     if (storeRow) setLangState((storeRow.language as Lang) ?? 'en');
@@ -94,11 +122,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const flags: FeatureFlags = store?.feature_flags ?? {};
-  const hasFeature = useCallback((key: string) => flags[key] === true || flags[key] === undefined, [flags]);
+  const isWholesale = store?.store_type === 'wholesale' || store?.store_type === 'mix';
+  const hasFeature = useCallback((key: string) => {
+    if (isWholesale && (key === 'wholesale_module' || key === 'wholesale_orders' || key === 'customer_directory' || key === 'khata_ledger')) {
+      return flags[key] !== false;
+    }
+    return flags[key] === true || flags[key] === undefined;
+  }, [flags, isWholesale]);
   const isOwner = user?.role === 'owner';
 
   return (
-    <AppContext.Provider value={{ loading, session, store, user, lang, setLang, refresh, signOut, hasFeature, isOwner }}>
+    <AppContext.Provider value={{ loading, session, store, setStore, user, lang, setLang, refresh, signOut, hasFeature, isOwner }}>
       {children}
     </AppContext.Provider>
   );

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from 'react';
 import { X, AlertTriangle, Loader2 } from 'lucide-react';
 import AnimatedNumber from './AnimatedNumber';
@@ -87,26 +88,59 @@ export function Badge({ tone = 'slate', children, className }: { tone?: BadgeTon
   return <span className={cn('inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium whitespace-nowrap', tones[tone], className)}>{children}</span>;
 }
 
-export function Modal({ open, onClose, title, children, wide }: { open: boolean; onClose: () => void; title: string; children: ReactNode; wide?: boolean }) {
+export function Modal({
+  open,
+  onClose,
+  title,
+  children,
+  wide,
+  footer,
+}: {
+  open: boolean;
+  onClose: () => void;
+  title: string;
+  children: ReactNode;
+  wide?: boolean;
+  footer?: ReactNode;
+}) {
   useEffect(() => {
     if (open) {
       document.body.style.overflow = 'hidden';
       return () => { document.body.style.overflow = ''; };
     }
   }, [open]);
-  if (!open) return null;
-  return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-900/50 backdrop-blur-xs p-0 sm:p-4 animate-fade-in" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className={cn('w-full bg-white dark:bg-slate-900 rounded-t-2xl sm:rounded-2xl shadow-xl max-h-[90dvh] flex flex-col animate-modal-scale-up', wide ? 'sm:max-w-2xl' : 'sm:max-w-md')}>
-        <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 px-5 py-4 shrink-0">
+
+  if (!open || typeof document === 'undefined') return null;
+
+  return createPortal(
+    <div
+      className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/50 p-0 sm:p-4 overflow-y-auto animate-fade-in"
+      onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div
+        className={cn(
+          'w-full sm:max-w-lg max-h-[90dvh] flex flex-col rounded-t-2xl sm:rounded-2xl overflow-hidden bg-white dark:bg-slate-900 shadow-xl animate-modal-scale-up',
+          wide && 'sm:max-w-2xl'
+        )}
+      >
+        <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 px-5 py-4 shrink-0 bg-white dark:bg-slate-900">
           <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100 truncate">{title}</h3>
-          <button onClick={onClose} className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-600 transition-colors">
+          <button
+            onClick={onClose}
+            className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-600 transition-colors"
+          >
             <X size={20} />
           </button>
         </div>
-        <div className="overflow-y-auto px-5 py-4 pb-8 sm:pb-6">{children}</div>
+        <div className="overflow-y-auto flex-1 p-4 sm:p-5">{children}</div>
+        {footer && (
+          <div className="border-t border-slate-200 dark:border-slate-800 px-5 py-3.5 shrink-0 bg-slate-50 dark:bg-slate-800/50">
+            {footer}
+          </div>
+        )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
@@ -199,13 +233,14 @@ export function useToast() {
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => setToast(null), 3000);
   };
-  const node = toast ? (
+  const node = toast && typeof document !== 'undefined' ? createPortal(
     <div className={cn(
-      'fixed bottom-20 sm:bottom-6 left-1/2 -translate-x-1/2 z-[60] rounded-lg px-4 py-2.5 text-sm font-medium shadow-lg max-w-[90vw] text-center animate-toast-pop',
+      'fixed bottom-20 sm:bottom-6 left-1/2 -translate-x-1/2 z-[110] rounded-lg px-4 py-2.5 text-sm font-medium shadow-lg max-w-[90vw] text-center animate-toast-pop',
       toast.error ? 'bg-red-600 text-white' : 'bg-slate-900 text-white'
     )}>
       {toast.msg}
-    </div>
+    </div>,
+    document.body
   ) : null;
   return { show, node };
 }

@@ -27,9 +27,10 @@ Deno.serve(async (req: Request) => {
     const phone = (body.phone ?? "").toString().replace(/\D/g, "");
     const password = (body.password ?? "").toString();
     const address = (body.address ?? "").toString().trim() || null;
-    const storeType = ["retail", "wholesale", "mix"].includes(body.storeType) ? body.storeType : null;
+    const rawType = (body.storeType ?? "").toString().trim().toLowerCase();
+    const storeType = ["retail", "wholesale", "mix"].includes(rawType) ? rawType : "retail";
 
-    if (!shopName || !ownerName || !password || !storeType) {
+    if (!shopName || !ownerName || !password) {
       return new Response(JSON.stringify({ error: "Missing required fields" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -223,7 +224,8 @@ async function handlePatch(req: Request): Promise<Response> {
       });
     }
     const body = await req.json();
-    const storeType = ["retail", "wholesale", "mix"].includes(body.storeType) ? body.storeType : null;
+    const rawPatchType = (body.storeType ?? "").toString().trim().toLowerCase();
+    const storeType = ["retail", "wholesale", "mix"].includes(rawPatchType) ? rawPatchType : null;
     if (!storeType) {
       return new Response(JSON.stringify({ error: "Invalid store type" }), {
         status: 400,
