@@ -4,6 +4,7 @@ import { useApp } from '@/context/AppContext';
 import { supabase } from '@/lib/supabase';
 import {
   Button, Input, Select, Label, Card, Badge, Modal, EmptyState, Spinner, useToast, ConfirmDialog, cn,
+  AnimatedContent, triggerClickSpark,
 } from '@/components/ui';
 import { formatINR, formatDateTime, waLink, agingBucket } from '@/lib/format';
 import { generateKhataStatementPDF } from '@/lib/pdf';
@@ -180,34 +181,36 @@ export default function Customers() {
         <EmptyState icon={<Users size={32} />} title="No wholesale customers" message="Add customers to start taking orders and maintaining khata." />
       ) : (
         <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-3">
-          {filtered.map((c) => {
+          {filtered.map((c, idx) => {
             const custOrders = orders.filter((o) => o.customer_id === c.id).sort((a, b) => b.created_at.localeCompare(a.created_at));
             const lastOrder = custOrders[0];
             const aging = agingBucket(lastOrder?.created_at);
             return (
-              <Card key={c.id} className="p-4">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <p className="font-medium text-slate-900 truncate">{c.shop_name}</p>
-                    <p className="text-xs text-slate-400 truncate">{c.name} · +91 {c.phone}</p>
+              <AnimatedContent key={c.id} index={idx}>
+                <Card className="p-4">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="font-medium text-slate-900 truncate">{c.shop_name}</p>
+                      <p className="text-xs text-slate-400 truncate">{c.name} · +91 {c.phone}</p>
+                    </div>
+                    <Badge tone={c.current_khata_balance > 0 ? aging.severity === 'danger' ? 'red' : aging.severity === 'warn' ? 'amber' : 'green' : 'green'}>
+                      {c.current_khata_balance > 0 ? aging.label : 'Clear'}
+                    </Badge>
                   </div>
-                  <Badge tone={c.current_khata_balance > 0 ? aging.severity === 'danger' ? 'red' : aging.severity === 'warn' ? 'amber' : 'green' : 'green'}>
-                    {c.current_khata_balance > 0 ? aging.label : 'Clear'}
-                  </Badge>
-                </div>
-                <p className="mt-3 text-2xl font-semibold text-slate-900">{formatINR(c.current_khata_balance)}</p>
-                <p className="text-xs text-slate-400">Khata balance · limit {formatINR(c.credit_limit)}</p>
-                <div className="mt-3 flex flex-wrap gap-1.5">
-                  <Button variant="secondary" className="!py-2 text-xs flex-1" onClick={() => { setSelected(c); void load(); }}>
-                    Khata
-                  </Button>
-                  <a href={waLink(c.phone, reminderTemplates[lang](c, lastOrder ? formatDateTime(lastOrder.created_at) : ''))} target="_blank" rel="noreferrer">
-                    <Button variant="secondary" className="!py-2 text-xs text-emerald-700"><MessageCircle size={14} /></Button>
-                  </a>
-                  <a href={`tel:+91${c.phone}`}><Button variant="ghost" className="!py-2"><Phone size={14} /></Button></a>
-                  {isOwner && <Button variant="ghost" className="!py-2 text-red-500" onClick={() => setDeleteCustomer(c)}>✕</Button>}
-                </div>
-              </Card>
+                  <p className="mt-3 text-2xl font-semibold text-slate-900">{formatINR(c.current_khata_balance)}</p>
+                  <p className="text-xs text-slate-400">Khata balance · limit {formatINR(c.credit_limit)}</p>
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    <Button variant="secondary" className="!py-2 text-xs flex-1" onClick={() => { setSelected(c); void load(); }}>
+                      Khata
+                    </Button>
+                    <a href={waLink(c.phone, reminderTemplates[lang](c, lastOrder ? formatDateTime(lastOrder.created_at) : ''))} target="_blank" rel="noreferrer">
+                      <Button variant="secondary" className="!py-2 text-xs text-emerald-700"><MessageCircle size={14} /></Button>
+                    </a>
+                    <a href={`tel:+91${c.phone}`}><Button variant="ghost" className="!py-2"><Phone size={14} /></Button></a>
+                    {isOwner && <Button variant="ghost" className="!py-2 text-red-500" onClick={() => setDeleteCustomer(c)}>✕</Button>}
+                  </div>
+                </Card>
+              </AnimatedContent>
             );
           })}
         </div>
@@ -280,7 +283,7 @@ export default function Customers() {
         <p className="mt-2 text-[11px] text-slate-400">The customer can log in to the Wholesale Customer App with this mobile number and password.</p>
         <div className="mt-4 flex justify-end gap-2">
           <Button variant="secondary" onClick={() => setAddModal(false)}>Cancel</Button>
-          <Button onClick={addCustomer} disabled={busy}>{busy ? 'Saving…' : 'Save'}</Button>
+          <Button onClick={(e) => { triggerClickSpark(e); addCustomer(); }} disabled={busy}>{busy ? 'Saving…' : 'Save'}</Button>
         </div>
       </Modal>
 
@@ -303,7 +306,7 @@ export default function Customers() {
             <Label>Notes / itemized details</Label>
             <Input value={khataNotes} onChange={(e) => setKhataNotes(e.target.value)} placeholder="e.g. 2 pota chawal, 1 box oil" />
           </div>
-          <Button className="w-full" onClick={submitKhataEntry} disabled={busy}>{busy ? 'Saving…' : 'Save Entry'}</Button>
+          <Button className="w-full" onClick={(e) => { triggerClickSpark(e); submitKhataEntry(); }} disabled={busy}>{busy ? 'Saving…' : 'Save Entry'}</Button>
         </div>
       </Modal>
 

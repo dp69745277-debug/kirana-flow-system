@@ -4,6 +4,7 @@ import { useApp } from '@/context/AppContext';
 import { supabase } from '@/lib/supabase';
 import {
   Button, Input, Select, Label, Card, Badge, Modal, ConfirmDialog, EmptyState, Spinner, useToast, cn,
+  AnimatedContent, triggerClickSpark,
 } from '@/components/ui';
 import { formatINR, formatDateTime } from '@/lib/format';
 import type { Agency, AgencyPayment, PendingHisaab, StoreUser, StaffAgencyPermission, StaffPermissions } from '@/lib/types';
@@ -172,42 +173,44 @@ export default function AgenciesScreen() {
             <EmptyState icon={<Truck size={32} />} title="No agencies" message="Add suppliers to track payable balances." />
           ) : (
             <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-3">
-              {visibleAgencies.map((a) => (
-                <Card key={a.id} className="p-4">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <p className="font-medium text-slate-900 truncate">{a.name}</p>
-                      <p className="text-xs text-slate-400">{a.phone ? `+91 ${a.phone}` : '—'}</p>
+              {visibleAgencies.map((a, idx) => (
+                <AnimatedContent key={a.id} index={idx}>
+                  <Card className="p-4">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="font-medium text-slate-900 truncate">{a.name}</p>
+                        <p className="text-xs text-slate-400">{a.phone ? `+91 ${a.phone}` : '—'}</p>
+                      </div>
+                      <Badge tone={a.balance > 0 ? 'red' : 'green'}>{a.balance > 0 ? 'Payable' : 'Clear'}</Badge>
                     </div>
-                    <Badge tone={a.balance > 0 ? 'red' : 'green'}>{a.balance > 0 ? 'Payable' : 'Clear'}</Badge>
-                  </div>
-                  <p className="mt-3 text-2xl font-semibold text-slate-900">{formatINR(a.balance)}</p>
-                  <p className="text-xs text-slate-400">Payable balance</p>
-                  <div className="mt-3 flex gap-1.5">
-                    <Button className="flex-1 !py-2 text-xs" onClick={() => setPayModal(a)}>Submit Payment</Button>
-                    {isOwner && (
-                      <>
-                        <Button variant="ghost" className="!py-2 text-xs" onClick={() => { setEditing(a); setAgForm({ name: a.name, phone: a.phone ?? '', balance: String(a.balance) }); setAgencyModal(true); }}>Edit</Button>
-                        <Button variant="ghost" className="!py-2 text-red-500" onClick={() => setDeleteAgency(a)}>✕</Button>
-                      </>
+                    <p className="mt-3 text-2xl font-semibold text-slate-900">{formatINR(a.balance)}</p>
+                    <p className="text-xs text-slate-400">Payable balance</p>
+                    <div className="mt-3 flex gap-1.5">
+                      <Button className="flex-1 !py-2 text-xs" onClick={() => setPayModal(a)}>Submit Payment</Button>
+                      {isOwner && (
+                        <>
+                          <Button variant="ghost" className="!py-2 text-xs" onClick={() => { setEditing(a); setAgForm({ name: a.name, phone: a.phone ?? '', balance: String(a.balance) }); setAgencyModal(true); }}>Edit</Button>
+                          <Button variant="ghost" className="!py-2 text-red-500" onClick={() => setDeleteAgency(a)}>✕</Button>
+                        </>
+                      )}
+                    </div>
+                    {payments.filter((p) => p.agency_id === a.id).length > 0 && (
+                      <div className="mt-3 border-t border-slate-100 pt-2">
+                        <p className="text-[11px] font-medium text-slate-400 mb-1">Payment history</p>
+                        <ul className="space-y-1 max-h-28 overflow-y-auto">
+                          {payments.filter((p) => p.agency_id === a.id).slice(0, 5).map((p) => (
+                            <li key={p.id} className="flex items-center justify-between text-xs">
+                              <span className="text-slate-500">{formatDateTime(p.created_at)} · {users.find((u) => u.id === p.paid_by_user_id)?.name ?? '—'}</span>
+                              <span className={cn('font-medium', p.status === 'approved' ? 'text-emerald-700' : p.status === 'pending' ? 'text-amber-600' : 'text-red-500')}>
+                                {formatINR(p.amount)} {p.status !== 'approved' && `(${p.status})`}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
                     )}
-                  </div>
-                  {payments.filter((p) => p.agency_id === a.id).length > 0 && (
-                    <div className="mt-3 border-t border-slate-100 pt-2">
-                      <p className="text-[11px] font-medium text-slate-400 mb-1">Payment history</p>
-                      <ul className="space-y-1 max-h-28 overflow-y-auto">
-                        {payments.filter((p) => p.agency_id === a.id).slice(0, 5).map((p) => (
-                          <li key={p.id} className="flex items-center justify-between text-xs">
-                            <span className="text-slate-500">{formatDateTime(p.created_at)} · {users.find((u) => u.id === p.paid_by_user_id)?.name ?? '—'}</span>
-                            <span className={cn('font-medium', p.status === 'approved' ? 'text-emerald-700' : p.status === 'pending' ? 'text-amber-600' : 'text-red-500')}>
-                              {formatINR(p.amount)} {p.status !== 'approved' && `(${p.status})`}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </Card>
+                  </Card>
+                </AnimatedContent>
               ))}
             </div>
           )}
@@ -299,7 +302,7 @@ export default function AgenciesScreen() {
             <div><Label>Review Note</Label><Input value={reviewNote} onChange={(e) => setReviewNote(e.target.value)} /></div>
             <div className="flex gap-2">
               <Button variant="danger" className="flex-1" onClick={() => review(false)} disabled={busy}>Reject</Button>
-              <Button className="flex-1" onClick={() => review(true)} disabled={busy}>Approve</Button>
+              <Button className="flex-1" onClick={(e) => { triggerClickSpark(e); review(true); }} disabled={busy}>Approve</Button>
             </div>
           </div>
         )}

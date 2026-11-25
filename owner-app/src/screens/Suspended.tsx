@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useApp } from '@/context/AppContext';
-import { Button, Card } from '@/components/ui';
+import { Button, Card, DotGrid } from '@/components/ui';
 
 export default function SuspendedScreen() {
   const { store, signOut, refresh } = useApp();
@@ -129,8 +129,9 @@ export default function SuspendedScreen() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-emerald-50 dark:from-slate-950 dark:via-slate-900 dark:to-emerald-950/20 flex items-center justify-center p-4">
-      <Card className="p-6 sm:p-8 max-w-md w-full text-center space-y-5 bg-white dark:bg-slate-900 shadow-2xl border-slate-200 dark:border-slate-800">
+    <div className="relative min-h-screen bg-slate-50 dark:bg-[#090d16] flex items-center justify-center p-4 overflow-hidden">
+      <DotGrid dotSize={1.5} gap={24} />
+      <Card className="relative z-10 p-6 sm:p-8 max-w-md w-full text-center space-y-5 bg-white dark:bg-slate-900 shadow-2xl border-slate-200/80 dark:border-slate-800/80">
         {/* Header Icon */}
         <div className="mx-auto w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg">
           {isExpired ? (

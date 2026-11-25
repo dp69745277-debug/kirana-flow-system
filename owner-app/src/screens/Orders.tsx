@@ -4,6 +4,7 @@ import { useApp } from '@/context/AppContext';
 import { supabase } from '@/lib/supabase';
 import {
   Button, Input, Select, Label, Card, Badge, Modal, ConfirmDialog, EmptyState, Spinner, useToast, cn,
+  AnimatedContent, triggerClickSpark,
 } from '@/components/ui';
 import { formatINR, formatDateTime, waLink } from '@/lib/format';
 import { generateInvoicePDF } from '@/lib/pdf';
@@ -491,106 +492,108 @@ export default function Orders() {
         <EmptyState icon={<ShoppingCart size={32} />} title="No orders" message="New orders from the Customer App appear here in realtime." />
       ) : (
         <div className="space-y-3">
-          {filtered.map((o) => {
+          {filtered.map((o, idx) => {
             const customer = customers.find((c) => c.id === o.customer_id);
             const lines = orderLines[o.id] ?? [];
             const nextAction = o.status === 'packed'
               ? (o.fulfillment_type === 'pickup' ? 'Mark Ready for Pickup' : 'Mark Out for Delivery')
               : STATUS_FLOW[o.status]?.label;
             return (
-              <Card key={o.id} className="p-4">
-                <div className="flex flex-wrap items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <p className="font-semibold text-slate-900">{o.order_number}</p>
-                      {statusBadge(o.status)}
-                      <Badge tone={o.fulfillment_type === 'pickup' ? 'blue' : 'teal'}>
-                        {o.fulfillment_type === 'pickup' ? 'Self-Pickup (At Shop)' : 'Staff Delivery'}
-                      </Badge>
-                    </div>
-                    <p className="mt-0.5 text-sm text-slate-500">
-                      {customer?.shop_name ?? 'Unknown customer'} · {formatDateTime(o.created_at)}
-                    </p>
-                  </div>
-                  <p className="text-lg font-semibold text-slate-900">{formatINR(o.final_total)}</p>
-                </div>
-
-                <div className="mt-2 flex flex-wrap gap-2">
-                  <Button variant="ghost" className="!py-1.5 text-xs" onClick={() => { setExpanded(expanded === o.id ? null : o.id); if (!orderLines[o.id]) void loadLines(o.id); }}>
-                    {expanded === o.id ? 'Hide items' : 'View items'}
-                  </Button>
-                  {customer && <a href={`tel:+91${customer.phone}`}><Button variant="ghost" className="!py-1.5 text-xs"><Phone size={13} /> Call</Button></a>}
-                  {o.status === 'delivered' && (
-                    <>
-                      <Button variant="ghost" className="!py-1.5 text-xs" onClick={() => {
-                        const cust = customers.find((c) => c.id === o.customer_id);
-                        generateInvoicePDF({
-                          store: store!, orderNumber: o.order_number,
-                          customerName: cust?.name ?? '', customerShop: cust?.shop_name ?? '', customerPhone: cust?.phone ?? '',
-                          items: lines.map((l) => ({ name: l.item_name_snapshot, qty: l.quantity, rate: l.final_unit_price, total: l.line_total })),
-                          subtotal: o.subtotal, discount: o.discount_amount, total: o.final_total,
-                          paymentMode: (o.payment_mode ?? 'cash').toUpperCase(), paidAmount: o.paid_amount, khataAmount: o.khata_amount,
-                          deliveredBy: users.find((u) => u.id === o.delivered_by_user_id)?.name ?? 'Staff', dateISO: o.updated_at,
-                        });
-                      }}><FileText size={13} /> Invoice PDF</Button>
-                      <a href={waLink(customer?.phone ?? '', buildInvoiceMessage(o, lines))} target="_blank" rel="noreferrer">
-                        <Button variant="ghost" className="!py-1.5 text-xs text-emerald-700"><MessageCircle size={13} /> Send on WhatsApp</Button>
-                      </a>
-                    </>
-                  )}
-                  {['placed', 'seen', 'packed'].includes(o.status) && (
-                    <>
-                      {o.status === 'placed' && (
-                        <Button variant="ghost" className="!py-1.5 text-xs" onClick={() => { setAddLineItem(o.id); setAddLineQty(''); }}>
-                          <Plus size={13} /> Add Item
-                        </Button>
-                      )}
-                      <Button variant="ghost" className="!py-1.5 text-xs text-red-500" onClick={() => setDeleteOrder(o)}><Trash2 size={13} /> Cancel</Button>
-                    </>
-                  )}
-                </div>
-
-                {expanded === o.id && (
-                  <div className="mt-3 border-t border-slate-100 pt-3">
-                    {lines.length === 0 ? <p className="text-xs text-slate-400">Loading…</p> : (
-                      <div className="overflow-x-auto -mx-1 px-1">
-                        <table className="w-full text-xs min-w-[280px]">
-                          <thead><tr className="text-slate-400 text-left">
-                            <th className="pb-1">Item</th><th className="pb-1 text-right">Qty</th>
-                            <th className="pb-1 text-right">Rate</th><th className="pb-1 text-right">Total</th>
-                          </tr></thead>
-                          <tbody>
-                            {lines.map((l) => (
-                              <tr key={l.id} className="border-t border-slate-50">
-                                <td className="py-1.5 text-slate-700">{l.item_name_snapshot}{l.final_unit_price !== l.original_unit_price && <Badge tone="amber" className="ml-1.5">adjusted</Badge>}</td>
-                                <td className="py-1.5 text-right">{l.quantity}</td>
-                                <td className="py-1.5 text-right">{formatINR(l.final_unit_price)}</td>
-                                <td className="py-1.5 text-right font-medium">{formatINR(l.line_total)}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
+              <AnimatedContent key={o.id} index={idx}>
+                <Card className="p-4">
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="font-semibold text-slate-900">{o.order_number}</p>
+                        {statusBadge(o.status)}
+                        <Badge tone={o.fulfillment_type === 'pickup' ? 'blue' : 'teal'}>
+                          {o.fulfillment_type === 'pickup' ? 'Self-Pickup (At Shop)' : 'Staff Delivery'}
+                        </Badge>
                       </div>
-                    )}
-                    {o.payment_mode && (
-                      <p className="mt-2 text-xs text-slate-500">
-                        Settled via {(o.payment_mode ?? '').toUpperCase()}
-                        {o.khata_amount ? ` · Khata ${formatINR(o.khata_amount)}` : ' · Fully paid'}
-                        {o.delivered_by_user_id && ` · by ${users.find((u) => u.id === o.delivered_by_user_id)?.name}`}
+                      <p className="mt-0.5 text-sm text-slate-500">
+                        {customer?.shop_name ?? 'Unknown customer'} · {formatDateTime(o.created_at)}
                       </p>
-                    )}
+                    </div>
+                    <p className="text-lg font-semibold text-slate-900">{formatINR(o.final_total)}</p>
                   </div>
-                )}
 
-                {['placed', 'seen', 'packed', 'out_for_delivery', 'ready_for_pickup'].includes(o.status) && (
-                  <div className="mt-3 flex gap-2">
-                    {nextAction && <Button className="flex-1 !py-2 text-xs" onClick={() => advance(o)}>{nextAction}</Button>}
-                    {['out_for_delivery', 'ready_for_pickup'].includes(o.status) && (
-                      <Button variant="amber" className="flex-1 !py-2 text-xs" onClick={() => openSettle(o)}>Complete / Settle</Button>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <Button variant="ghost" className="!py-1.5 text-xs" onClick={() => { setExpanded(expanded === o.id ? null : o.id); if (!orderLines[o.id]) void loadLines(o.id); }}>
+                      {expanded === o.id ? 'Hide items' : 'View items'}
+                    </Button>
+                    {customer && <a href={`tel:+91${customer.phone}`}><Button variant="ghost" className="!py-1.5 text-xs"><Phone size={13} /> Call</Button></a>}
+                    {o.status === 'delivered' && (
+                      <>
+                        <Button variant="ghost" className="!py-1.5 text-xs" onClick={() => {
+                          const cust = customers.find((c) => c.id === o.customer_id);
+                          generateInvoicePDF({
+                            store: store!, orderNumber: o.order_number,
+                            customerName: cust?.name ?? '', customerShop: cust?.shop_name ?? '', customerPhone: cust?.phone ?? '',
+                            items: lines.map((l) => ({ name: l.item_name_snapshot, qty: l.quantity, rate: l.final_unit_price, total: l.line_total })),
+                            subtotal: o.subtotal, discount: o.discount_amount, total: o.final_total,
+                            paymentMode: (o.payment_mode ?? 'cash').toUpperCase(), paidAmount: o.paid_amount, khataAmount: o.khata_amount,
+                            deliveredBy: users.find((u) => u.id === o.delivered_by_user_id)?.name ?? 'Staff', dateISO: o.updated_at,
+                          });
+                        }}><FileText size={13} /> Invoice PDF</Button>
+                        <a href={waLink(customer?.phone ?? '', buildInvoiceMessage(o, lines))} target="_blank" rel="noreferrer">
+                          <Button variant="ghost" className="!py-1.5 text-xs text-emerald-700"><MessageCircle size={13} /> Send on WhatsApp</Button>
+                        </a>
+                      </>
+                    )}
+                    {['placed', 'seen', 'packed'].includes(o.status) && (
+                      <>
+                        {o.status === 'placed' && (
+                          <Button variant="ghost" className="!py-1.5 text-xs" onClick={() => { setAddLineItem(o.id); setAddLineQty(''); }}>
+                            <Plus size={13} /> Add Item
+                          </Button>
+                        )}
+                        <Button variant="ghost" className="!py-1.5 text-xs text-red-500" onClick={() => setDeleteOrder(o)}><Trash2 size={13} /> Cancel</Button>
+                      </>
                     )}
                   </div>
-                )}
-              </Card>
+
+                  {expanded === o.id && (
+                    <div className="mt-3 border-t border-slate-100 pt-3">
+                      {lines.length === 0 ? <p className="text-xs text-slate-400">Loading…</p> : (
+                        <div className="overflow-x-auto -mx-1 px-1">
+                          <table className="w-full text-xs min-w-[280px]">
+                            <thead><tr className="text-slate-400 text-left">
+                              <th className="pb-1">Item</th><th className="pb-1 text-right">Qty</th>
+                              <th className="pb-1 text-right">Rate</th><th className="pb-1 text-right">Total</th>
+                            </tr></thead>
+                            <tbody>
+                              {lines.map((l) => (
+                                <tr key={l.id} className="border-t border-slate-50">
+                                  <td className="py-1.5 text-slate-700">{l.item_name_snapshot}{l.final_unit_price !== l.original_unit_price && <Badge tone="amber" className="ml-1.5">adjusted</Badge>}</td>
+                                  <td className="py-1.5 text-right">{l.quantity}</td>
+                                  <td className="py-1.5 text-right">{formatINR(l.final_unit_price)}</td>
+                                  <td className="py-1.5 text-right font-medium">{formatINR(l.line_total)}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                      {o.payment_mode && (
+                        <p className="mt-2 text-xs text-slate-500">
+                          Settled via {(o.payment_mode ?? '').toUpperCase()}
+                          {o.khata_amount ? ` · Khata ${formatINR(o.khata_amount)}` : ' · Fully paid'}
+                          {o.delivered_by_user_id && ` · by ${users.find((u) => u.id === o.delivered_by_user_id)?.name}`}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {['placed', 'seen', 'packed', 'out_for_delivery', 'ready_for_pickup'].includes(o.status) && (
+                    <div className="mt-3 flex gap-2">
+                      {nextAction && <Button className="flex-1 !py-2 text-xs" onClick={(e) => { triggerClickSpark(e); advance(o); }}>{nextAction}</Button>}
+                      {['out_for_delivery', 'ready_for_pickup'].includes(o.status) && (
+                        <Button variant="amber" className="flex-1 !py-2 text-xs" onClick={() => openSettle(o)}>Complete / Settle</Button>
+                      )}
+                    </div>
+                  )}
+                </Card>
+              </AnimatedContent>
             );
           })}
         </div>
@@ -708,7 +711,7 @@ export default function Orders() {
               )}
 
               <p className="text-[11px] text-slate-400">Stock auto-deducts and credit posts to Khata on completion. Price changes are audit-logged.</p>
-              <Button className="w-full" onClick={() => applySettlement()} disabled={busy}>{busy ? 'Completing…' : 'Complete Order'}</Button>
+              <Button className="w-full" onClick={(e) => { triggerClickSpark(e); applySettlement(); }} disabled={busy}>{busy ? 'Completing…' : 'Complete Order'}</Button>
             </div>
           );
         })()}
@@ -818,7 +821,7 @@ export default function Orders() {
             <Label>Notes</Label>
             <Input value={newNotes} onChange={(e) => setNewNotes(e.target.value)} />
           </div>
-          <Button className="w-full" onClick={createManualOrder} disabled={busy}>{busy ? 'Creating…' : 'Create Order'}</Button>
+          <Button className="w-full" onClick={(e) => { triggerClickSpark(e); createManualOrder(); }} disabled={busy}>{busy ? 'Creating…' : 'Create Order'}</Button>
         </div>
       </Modal>
 

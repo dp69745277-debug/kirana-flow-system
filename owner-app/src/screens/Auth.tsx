@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Store as StoreIcon, ChevronLeft, CheckCircle2, Sparkles } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useApp } from '@/context/AppContext';
-import { Button, Input, Label, Card, cn, useToast, Spinner } from '@/components/ui';
+import { Button, Input, Label, Card, cn, useToast, Spinner, DotGrid, ShinyText, BlurText } from '@/components/ui';
 import type { Store, StoreType } from '@/lib/types';
 import { seedDemoData } from '@/lib/seed';
 
@@ -178,30 +178,41 @@ export default function AuthScreen({ onBack }: { onBack?: () => void }) {
 
   if (registeredStoreId) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+      <div className="relative min-h-screen bg-slate-50 dark:bg-[#090d16] flex items-center justify-center p-4 overflow-hidden">
+        <DotGrid dotSize={1.5} gap={24} />
         {toastNode}
-        <Card className="p-8 max-w-md text-center">
-          <CheckCircle2 className="mx-auto text-emerald-600 mb-3" size={44} />
-          <h1 className="text-xl font-bold text-slate-900">Store created!</h1>
-          <p className="mt-2 text-sm text-slate-500">Loading your dashboard…</p>
+        <Card className="relative z-10 p-8 max-w-md text-center shadow-xl border-slate-200/80 dark:border-slate-800/80">
+          <CheckCircle2 className="mx-auto text-emerald-600 mb-3 animate-bounce" size={44} />
+          <h1 className="text-xl font-bold text-slate-900 dark:text-white">
+            <ShinyText>Store created!</ShinyText>
+          </h1>
+          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Loading your dashboard…</p>
         </Card>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
+    <div className="relative min-h-screen bg-slate-50 dark:bg-[#090d16] flex flex-col items-center justify-center p-4 overflow-hidden">
+      <DotGrid dotSize={1.5} gap={24} />
       {toastNode}
-      <div className="w-full max-w-md">
+      <div className="relative z-10 w-full max-w-md animate-fade-in">
         <div className="text-center mb-6">
-          <div className="mx-auto w-14 h-14 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-lg shadow-emerald-600/20">
+          <div className="relative mx-auto w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center shadow-lg shadow-emerald-600/30 ring-4 ring-emerald-500/10">
             <StoreIcon size={28} />
           </div>
-          <h1 className="mt-3 text-2xl font-bold text-slate-900">KiranaHisab</h1>
-          <p className="text-sm text-slate-500">Smart store management for Indian kirana</p>
+          <h1 className="mt-3 text-2xl font-bold text-slate-900 dark:text-white flex items-center justify-center gap-1.5">
+            <ShinyText speed={4}>Kirana Store</ShinyText>
+          </h1>
+          <div className="mt-1">
+            <BlurText
+              text="Smart godown inventory, orders & digital khata"
+              className="text-sm text-slate-500 dark:text-slate-400 justify-center"
+            />
+          </div>
         </div>
 
-        <Card className="p-5">
+        <Card className="p-5 sm:p-6 shadow-xl border-slate-200/80 dark:border-slate-800/80 backdrop-blur-xs">
           {mode === 'login' && (
             <div>
               <h2 className="text-lg font-semibold text-slate-900">Login</h2>

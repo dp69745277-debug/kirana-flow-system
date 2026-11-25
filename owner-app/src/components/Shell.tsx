@@ -187,25 +187,33 @@ export default function Shell({ page, setPage, children }: { page: PageKey; setP
             </button>
           </div>
         </div>
-        <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto">
-          {visibleNav.map((n) => (
-            <button
-              key={n.key}
-              onClick={() => {
-                playClick();
-                setPage(n.key);
-              }}
-              className={cn(
-                'w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
-                page === n.key ? 'bg-emerald-50 text-emerald-700' : 'text-slate-600 hover:bg-slate-50'
-              )}
-            >
-              {n.icon} {t(n.labelKey, lang)}
-              {n.key === 'agencies' && isOwner && pendingCount > 0 && (
-                <span className="ml-auto bg-amber-100 text-amber-700 rounded-full px-1.5 text-[11px] font-semibold">{pendingCount}</span>
-              )}
-            </button>
-          ))}
+        <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
+          {visibleNav.map((n) => {
+            const isActive = page === n.key;
+            return (
+              <button
+                key={n.key}
+                onClick={() => {
+                  playClick();
+                  setPage(n.key);
+                }}
+                className={cn(
+                  'relative w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-150 active:scale-[0.98]',
+                  isActive
+                    ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 shadow-2xs border border-emerald-500/20'
+                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100/70 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-200'
+                )}
+              >
+                {isActive && (
+                  <span className="absolute left-0 top-2.5 bottom-2.5 w-1 bg-emerald-600 rounded-r-full" />
+                )}
+                {n.icon} {t(n.labelKey, lang)}
+                {n.key === 'agencies' && isOwner && pendingCount > 0 && (
+                  <span className="ml-auto bg-amber-100 text-amber-700 dark:bg-amber-950/80 dark:text-amber-300 rounded-full px-1.5 text-[11px] font-semibold">{pendingCount}</span>
+                )}
+              </button>
+            );
+          })}
         </nav>
         <button onClick={signOut} className="flex items-center gap-3 px-6 py-4 text-sm text-slate-500 hover:text-red-600 hover:bg-slate-50 border-t border-slate-100">
           <LogOut size={18} /> {t('logout', lang)}
@@ -338,31 +346,44 @@ export default function Shell({ page, setPage, children }: { page: PageKey; setP
 
       {/* Mobile drawer */}
       {drawer && (
-        <div className="lg:hidden fixed inset-0 z-40 bg-slate-900/50" onMouseDown={(e) => { if (e.target === e.currentTarget) setDrawer(false); }}>
-          <div className="absolute inset-y-0 left-0 w-64 bg-white shadow-xl flex flex-col animate-in">
-            <div className="flex items-center justify-between px-4 py-4 border-b border-slate-100">
-              <div>
-                <p className="font-semibold text-slate-900 truncate">{store.shop_name}</p>
-                <p className="text-xs text-slate-400">{store.store_code}</p>
+        <div className="lg:hidden fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-sm transition-opacity" onMouseDown={(e) => { if (e.target === e.currentTarget) setDrawer(false); }}>
+          <div className="absolute inset-y-0 left-0 w-72 bg-white dark:bg-slate-900 shadow-2xl flex flex-col border-r border-slate-200/80 dark:border-slate-800 animate-slide-in-left">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
+              <div className="min-w-0 flex-1">
+                <p className="font-semibold text-slate-900 dark:text-slate-100 truncate">{store.shop_name}</p>
+                <p className="text-xs text-slate-400 font-mono">{store.store_code}</p>
               </div>
-              <button onClick={() => setDrawer(false)} className="p-1.5 text-slate-400"><X size={18} /></button>
+              <button onClick={() => setDrawer(false)} className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                <X size={18} />
+              </button>
             </div>
-            <nav className="flex-1 px-3 py-2 space-y-0.5 overflow-y-auto">
-              {visibleNav.map((n) => (
-                <button
-                  key={n.key}
-                  onClick={() => {
-                    playClick();
-                    setPage(n.key);
-                    setDrawer(false);
-                  }}
-                  className={cn('w-full flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium', page === n.key ? 'bg-emerald-50 text-emerald-700' : 'text-slate-600')}
-                >
-                  {n.icon} {t(n.labelKey, lang)}
-                </button>
-              ))}
+            <nav className="flex-1 px-3 py-3 space-y-1 overflow-y-auto">
+              {visibleNav.map((n) => {
+                const isActive = page === n.key;
+                return (
+                  <button
+                    key={n.key}
+                    onClick={() => {
+                      playClick();
+                      setPage(n.key);
+                      setDrawer(false);
+                    }}
+                    className={cn(
+                      'w-full flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all duration-150',
+                      isActive
+                        ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 font-semibold shadow-xs'
+                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                    )}
+                  >
+                    {n.icon} {t(n.labelKey, lang)}
+                  </button>
+                );
+              })}
             </nav>
-            <button onClick={signOut} className="flex items-center gap-3 px-6 py-4 text-sm text-slate-500 border-t border-slate-100">
+            <button
+              onClick={signOut}
+              className="flex items-center gap-3 px-6 py-4 text-sm text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 border-t border-slate-100 dark:border-slate-800 transition-colors"
+            >
               <LogOut size={18} /> {t('logout', lang)}
             </button>
           </div>
@@ -374,9 +395,10 @@ export default function Shell({ page, setPage, children }: { page: PageKey; setP
       </main>
 
       {/* Mobile bottom nav */}
-      <nav className="lg:hidden fixed bottom-0 inset-x-0 z-30 bg-white border-t border-slate-200 flex min-h-[58px] pb-[env(safe-area-inset-bottom)]">
+      <nav className="lg:hidden fixed bottom-0 inset-x-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200/80 dark:border-slate-800/80 flex min-h-[58px] pb-[env(safe-area-inset-bottom)] px-1">
         {mobileItems.map((k) => {
           const item = NAV.find((n) => n.key === k)!;
+          const isActive = page === k;
           return (
             <button
               key={k}
@@ -384,14 +406,23 @@ export default function Shell({ page, setPage, children }: { page: PageKey; setP
                 playClick();
                 setPage(k);
               }}
-              className={cn('flex-1 flex flex-col items-center gap-0.5 py-2.5 text-[10px] font-medium min-h-[56px] justify-center', page === k ? 'text-emerald-700' : 'text-slate-400')}
+              className={cn(
+                'relative flex-1 flex flex-col items-center gap-0.5 py-2 text-[10px] font-medium min-h-[56px] justify-center transition-all duration-200 active:scale-95',
+                isActive ? 'text-emerald-700 dark:text-emerald-400 font-semibold' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+              )}
             >
+              {isActive && (
+                <span className="absolute inset-x-1.5 inset-y-1 bg-emerald-50 dark:bg-emerald-950/60 rounded-xl -z-10 border border-emerald-500/20" />
+              )}
               {item.icon}
               {t(item.labelKey, lang)}
             </button>
           );
         })}
-        <button onClick={() => setDrawer(true)} className="flex-1 flex flex-col items-center gap-0.5 py-2.5 text-[10px] font-medium text-slate-400 min-h-[56px] justify-center">
+        <button
+          onClick={() => setDrawer(true)}
+          className="relative flex-1 flex flex-col items-center gap-0.5 py-2 text-[10px] font-medium text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 min-h-[56px] justify-center transition-all duration-200 active:scale-95"
+        >
           <Menu size={20} />
           More
         </button>

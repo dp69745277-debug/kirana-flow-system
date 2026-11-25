@@ -189,15 +189,15 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
 
   const isStoreSuspended = Boolean(
     store &&
-      (store.is_active === false ||
-        store.subscription_status === 'suspended' ||
-        store.subscription_status === 'expired' ||
-        (store.subscription_status === 'trial' &&
-          store.trial_ends_at &&
-          new Date(store.trial_ends_at).getTime() < Date.now()) ||
-        (store.subscription_status === 'active' &&
-          store.subscription_ends_at &&
-          new Date(store.subscription_ends_at).getTime() < Date.now()))
+    (store.is_active === false ||
+      store.subscription_status === 'suspended' ||
+      store.subscription_status === 'expired' ||
+      (store.subscription_status === 'trial' &&
+        store.trial_ends_at &&
+        new Date(store.trial_ends_at).getTime() < Date.now()) ||
+      (store.subscription_status === 'active' &&
+        store.subscription_ends_at &&
+        new Date(store.subscription_ends_at).getTime() < Date.now()))
   );
   const isCustomerInactive = !!customer && customer.is_active === false;
   const isStoreTypeMismatch = !!store && store.store_type !== 'wholesale' && store.store_type !== 'mix';
