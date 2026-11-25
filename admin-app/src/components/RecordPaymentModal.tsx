@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { CreditCard, DollarSign, Calendar, CheckCircle2, AlertTriangle, ArrowRight } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import type { Store as StoreModel, PlanName, BillingCycle } from '@/lib/types';
-import { Modal, Button, Input, Label, Select, Textarea, useToast } from '@/components/ui';
+import { Modal, Button, Input, Label, Select, Textarea, ClickSpark, useToast } from '@/components/ui';
 import { formatCurrency } from '@/lib/format';
 import confetti from 'canvas-confetti';
 
@@ -213,9 +213,11 @@ export const RecordPaymentModal: React.FC<RecordPaymentModalProps> = ({
           <Button variant="outline" size="sm" type="button" onClick={onClose} disabled={loading}>
             Cancel
           </Button>
-          <Button variant="primary" size="sm" type="submit" loading={loading} icon={<CheckCircle2 className="w-4 h-4" />}>
-            Confirm & Activate Store
-          </Button>
+          <ClickSpark disabled={loading} sparkColor={['#10b981', '#34d399']}>
+            <Button variant="primary" size="sm" type="submit" loading={loading} icon={<CheckCircle2 className="w-4 h-4" />}>
+              Confirm & Activate Store
+            </Button>
+          </ClickSpark>
         </div>
       </form>
     </Modal>

@@ -4,7 +4,7 @@ import { useApp } from '@/context/AppContext';
 import { supabase } from '@/lib/supabase';
 import {
   Button, Input, Select, Label, Card, Badge, Modal, ConfirmDialog, EmptyState, Spinner, useToast, cn,
-  AnimatedContent, triggerClickSpark,
+  AnimatedContent, ClickSpark,
 } from '@/components/ui';
 import { formatINR, formatDateTime, waLink } from '@/lib/format';
 import { generateInvoicePDF } from '@/lib/pdf';
@@ -586,9 +586,15 @@ export default function Orders() {
 
                   {['placed', 'seen', 'packed', 'out_for_delivery', 'ready_for_pickup'].includes(o.status) && (
                     <div className="mt-3 flex gap-2">
-                      {nextAction && <Button className="flex-1 !py-2 text-xs" onClick={(e) => { triggerClickSpark(e); advance(o); }}>{nextAction}</Button>}
+                      {nextAction && (
+                        <ClickSpark className="flex-1" sparkColor={['#10b981', '#34d399']}>
+                          <Button className="w-full !py-2 text-xs" onClick={() => advance(o)}>{nextAction}</Button>
+                        </ClickSpark>
+                      )}
                       {['out_for_delivery', 'ready_for_pickup'].includes(o.status) && (
-                        <Button variant="amber" className="flex-1 !py-2 text-xs" onClick={() => openSettle(o)}>Complete / Settle</Button>
+                        <ClickSpark className="flex-1" sparkColor={['#10b981', '#34d399']}>
+                          <Button variant="amber" className="w-full !py-2 text-xs" onClick={() => openSettle(o)}>Complete / Settle</Button>
+                        </ClickSpark>
                       )}
                     </div>
                   )}
@@ -711,7 +717,9 @@ export default function Orders() {
               )}
 
               <p className="text-[11px] text-slate-400">Stock auto-deducts and credit posts to Khata on completion. Price changes are audit-logged.</p>
-              <Button className="w-full" onClick={(e) => { triggerClickSpark(e); applySettlement(); }} disabled={busy}>{busy ? 'Completing…' : 'Complete Order'}</Button>
+              <ClickSpark className="w-full" disabled={busy} sparkColor={['#10b981', '#34d399']}>
+                <Button className="w-full" onClick={() => applySettlement()} disabled={busy}>{busy ? 'Completing…' : 'Complete Order'}</Button>
+              </ClickSpark>
             </div>
           );
         })()}
@@ -821,7 +829,9 @@ export default function Orders() {
             <Label>Notes</Label>
             <Input value={newNotes} onChange={(e) => setNewNotes(e.target.value)} />
           </div>
-          <Button className="w-full" onClick={(e) => { triggerClickSpark(e); createManualOrder(); }} disabled={busy}>{busy ? 'Creating…' : 'Create Order'}</Button>
+          <ClickSpark className="w-full" disabled={busy} sparkColor={['#10b981', '#34d399']}>
+            <Button className="w-full" onClick={() => createManualOrder()} disabled={busy}>{busy ? 'Creating…' : 'Create Order'}</Button>
+          </ClickSpark>
         </div>
       </Modal>
 

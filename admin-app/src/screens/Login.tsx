@@ -8,7 +8,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { useAdminAuth } from '@/context/AdminAuthContext';
-import { Button, Input, Label, Card, Badge } from '@/components/ui';
+import { Button, Input, Label, Card, Badge, BlurText } from '@/components/ui';
 
 export const LoginScreen: React.FC = () => {
   const { signIn } = useAdminAuth();
@@ -42,9 +42,18 @@ export const LoginScreen: React.FC = () => {
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white shadow-lg shadow-emerald-500/25 mb-1">
             <ShieldCheck className="w-7 h-7" />
           </div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-            Kirana<span className="text-emerald-600 dark:text-emerald-400">SaaS</span> Super Admin
-          </h1>
+          <BlurText
+            as="h1"
+            text="KiranaSaaS Super Admin"
+            delay={80}
+            stepDuration={0.28}
+            blur={6}
+            distance={16}
+            animateBy="words"
+            direction="top"
+            trigger="load"
+            className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white justify-center"
+          />
           <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xs mx-auto">
             Authorized portal for platform creator & operations. Connected to shared production database.
           </p>

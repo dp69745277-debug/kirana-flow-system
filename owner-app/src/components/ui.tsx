@@ -4,8 +4,10 @@ import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, SelectHTMLAt
 import { X, AlertTriangle, Loader2 } from 'lucide-react';
 import AnimatedNumber from './AnimatedNumber';
 import SpotlightCard from './SpotlightCard';
+import CountUp from './CountUp';
 import DotGrid from './DotGrid';
-import { ShinyText, BlurText } from './ShinyText';
+import { ShinyText } from './ShinyText';
+import BlurText from './BlurText';
 import ClickSpark, { triggerClickSpark } from './ClickSpark';
 import AnimatedContent from './AnimatedContent';
 import { playClick, playSuccess, playAlert } from '@/lib/sound';
@@ -13,6 +15,7 @@ import { playClick, playSuccess, playAlert } from '@/lib/sound';
 export {
   AnimatedNumber,
   SpotlightCard,
+  CountUp,
   DotGrid,
   ShinyText,
   BlurText,
@@ -212,6 +215,40 @@ export function ConfirmDialog({ open, title, message, confirmLabel = 'Delete', o
   );
 }
 
+function parseStatCountProps(val: string | number): {
+  to: number;
+  prefix: string;
+  decimals: number;
+} | null {
+  if (typeof val === 'number') {
+    if (Number.isNaN(val)) return null;
+    return {
+      to: val,
+      prefix: '',
+      decimals: Number.isInteger(val) ? 0 : 2,
+    };
+  }
+  const str = String(val).trim();
+  let prefix = '';
+  let rest = str;
+  if (str.startsWith('₹')) {
+    prefix = '₹';
+    rest = str.slice(1);
+  } else if (str.startsWith('+')) {
+    prefix = '+';
+    rest = str.slice(1);
+  } else if (str.startsWith('-')) {
+    prefix = '-';
+    rest = str.slice(1);
+  }
+  const cleaned = rest.replace(/[,\s]/g, '');
+  const parsed = parseFloat(cleaned);
+  if (Number.isNaN(parsed)) return null;
+  const parts = cleaned.split('.');
+  const decimals = parts.length > 1 ? Math.min(parts[1].length, 2) : 0;
+  return { to: parsed, prefix, decimals };
+}
+
 export function StatCard({ label, value, sub, tone = 'slate', icon, className }: { label: string; value: string | number; sub?: string; tone?: BadgeTone; icon?: ReactNode; className?: string }) {
   const tones: Record<BadgeTone, string> = {
     green: 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-800/50',
@@ -221,13 +258,38 @@ export function StatCard({ label, value, sub, tone = 'slate', icon, className }:
     slate: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200/50 dark:border-slate-700/50',
     teal: 'bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-400 border border-teal-200/50 dark:border-teal-800/50',
   };
+  const spotlightColors: Record<BadgeTone, string> = {
+    green: '#10b981',
+    amber: '#f59e0b',
+    red: '#ef4444',
+    blue: '#0ea5e9',
+    slate: '#64748b',
+    teal: '#14b8a6',
+  };
+  const parsed = parseStatCountProps(value);
   return (
-    <SpotlightCard className={cn('p-4 transition-all duration-200 hover:-translate-y-0.5', className)}>
+    <SpotlightCard
+      spotlightColor={spotlightColors[tone]}
+      intensity={0.2}
+      borderGlow={0.4}
+      className={cn('p-4 transition-transform duration-200 hover:-translate-y-0.5', className)}
+    >
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <p className="text-xs font-medium text-slate-500 dark:text-slate-400 tracking-wide">{label}</p>
           <p className="mt-1 text-2xl font-bold text-slate-900 dark:text-slate-100 truncate tabular-nums">
-            <AnimatedNumber value={value} />
+            {parsed ? (
+              <CountUp
+                to={parsed.to}
+                prefix={parsed.prefix}
+                decimals={parsed.decimals}
+                locale="en-IN"
+                duration={0.85}
+                trigger="load"
+              />
+            ) : (
+              value
+            )}
           </p>
           {sub && <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">{sub}</p>}
         </div>

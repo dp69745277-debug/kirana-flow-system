@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Store as StoreIcon, ChevronLeft, CheckCircle2, Sparkles } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useApp } from '@/context/AppContext';
-import { Button, Input, Label, Card, cn, useToast, Spinner, DotGrid, ShinyText, BlurText } from '@/components/ui';
+import { Button, Input, Label, Card, cn, useToast, Spinner, DotGrid, BlurText } from '@/components/ui';
 import type { Store, StoreType } from '@/lib/types';
 import { seedDemoData } from '@/lib/seed';
 
@@ -183,9 +183,16 @@ export default function AuthScreen({ onBack }: { onBack?: () => void }) {
         {toastNode}
         <Card className="relative z-10 p-8 max-w-md text-center shadow-xl border-slate-200/80 dark:border-slate-800/80">
           <CheckCircle2 className="mx-auto text-emerald-600 mb-3 animate-bounce" size={44} />
-          <h1 className="text-xl font-bold text-slate-900 dark:text-white">
-            <ShinyText>Store created!</ShinyText>
-          </h1>
+          <BlurText
+            as="h1"
+            text="Store created!"
+            delay={70}
+            stepDuration={0.26}
+            blur={5}
+            distance={12}
+            trigger="load"
+            className="text-xl font-bold text-emerald-700 dark:text-emerald-400 justify-center"
+          />
           <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Loading your dashboard…</p>
         </Card>
       </div>
@@ -201,15 +208,21 @@ export default function AuthScreen({ onBack }: { onBack?: () => void }) {
           <div className="relative mx-auto w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center shadow-lg shadow-emerald-600/30 ring-4 ring-emerald-500/10">
             <StoreIcon size={28} />
           </div>
-          <h1 className="mt-3 text-2xl font-bold text-slate-900 dark:text-white flex items-center justify-center gap-1.5">
-            <ShinyText speed={4}>Kirana Store</ShinyText>
-          </h1>
-          <div className="mt-1">
-            <BlurText
-              text="Smart godown inventory, orders & digital khata"
-              className="text-sm text-slate-500 dark:text-slate-400 justify-center"
-            />
-          </div>
+          <BlurText
+            as="h1"
+            text="Kirana Store"
+            delay={90}
+            stepDuration={0.28}
+            blur={6}
+            distance={16}
+            animateBy="words"
+            direction="top"
+            trigger="load"
+            className="mt-3 text-2xl font-extrabold text-emerald-700 dark:text-emerald-400 justify-center tracking-tight"
+          />
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            Smart godown inventory, orders &amp; digital khata
+          </p>
         </div>
 
         <Card className="p-5 sm:p-6 shadow-xl border-slate-200/80 dark:border-slate-800/80 backdrop-blur-xs">

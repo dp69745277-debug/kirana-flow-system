@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { CalendarDays, Calculator } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { supabase } from '@/lib/supabase';
-import { Button, Input, Label, Card, StatCard, Spinner, useToast, EmptyState, triggerClickSpark } from '@/components/ui';
+import { Button, Input, Label, Card, StatCard, Spinner, useToast, EmptyState, ClickSpark } from '@/components/ui';
 import { formatINR, todayISO } from '@/lib/format';
 import type { DailyHisaab, KhataTransaction, StoreUser } from '@/lib/types';
 
@@ -127,7 +127,9 @@ export default function Hisaab() {
           </div>
           <p className="text-[11px] text-slate-400 mt-1">Drawer = Cash Sales {formatINR(cashN)} + Cash Khata Collections {formatINR(cashCollections)} − Cash Expenses {formatINR(expensesN)}</p>
         </div>
-        <Button className="mt-3 w-full sm:w-auto" onClick={(e) => { triggerClickSpark(e); save(); }} disabled={busy}>{busy ? 'Saving…' : existing ? 'Update Hisaab' : 'Save Hisaab'}</Button>
+        <ClickSpark className="mt-3 w-full sm:w-auto" disabled={busy} sparkColor={['#10b981', '#34d399']}>
+          <Button className="w-full sm:w-auto" onClick={() => save()} disabled={busy}>{busy ? 'Saving…' : existing ? 'Update Hisaab' : 'Save Hisaab'}</Button>
+        </ClickSpark>
       </Card>
 
       <h3 className="font-semibold text-slate-800">Last 31 Days</h3>

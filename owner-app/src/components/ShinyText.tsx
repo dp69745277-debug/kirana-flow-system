@@ -21,31 +21,4 @@ export function ShinyText({ children, className = '', speed = 4 }: ShinyTextProp
   );
 }
 
-interface BlurTextProps {
-  text: string;
-  className?: string;
-  delay?: number;
-}
-
-export function BlurText({ text, className = '', delay = 40 }: BlurTextProps) {
-  const words = text.split(' ');
-
-  return (
-    <span className={`inline-flex flex-wrap gap-x-1.5 ${className}`}>
-      {words.map((word, i) => (
-        <span
-          key={i}
-          className="inline-block animate-blur-word-in"
-          style={{
-            animationDelay: `${i * delay}ms`,
-            animationFillMode: 'both',
-          }}
-        >
-          {word}
-        </span>
-      ))}
-    </span>
-  );
-}
-
 export default ShinyText;

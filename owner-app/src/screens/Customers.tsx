@@ -4,7 +4,7 @@ import { useApp } from '@/context/AppContext';
 import { supabase } from '@/lib/supabase';
 import {
   Button, Input, Select, Label, Card, Badge, Modal, EmptyState, Spinner, useToast, ConfirmDialog, cn,
-  AnimatedContent, triggerClickSpark,
+  AnimatedContent, ClickSpark,
 } from '@/components/ui';
 import { formatINR, formatDateTime, waLink, agingBucket } from '@/lib/format';
 import { generateKhataStatementPDF } from '@/lib/pdf';
@@ -283,7 +283,9 @@ export default function Customers() {
         <p className="mt-2 text-[11px] text-slate-400">The customer can log in to the Wholesale Customer App with this mobile number and password.</p>
         <div className="mt-4 flex justify-end gap-2">
           <Button variant="secondary" onClick={() => setAddModal(false)}>Cancel</Button>
-          <Button onClick={(e) => { triggerClickSpark(e); addCustomer(); }} disabled={busy}>{busy ? 'Saving…' : 'Save'}</Button>
+          <ClickSpark disabled={busy} sparkColor={['#10b981', '#34d399']}>
+            <Button onClick={() => addCustomer()} disabled={busy}>{busy ? 'Saving…' : 'Save'}</Button>
+          </ClickSpark>
         </div>
       </Modal>
 
@@ -306,7 +308,9 @@ export default function Customers() {
             <Label>Notes / itemized details</Label>
             <Input value={khataNotes} onChange={(e) => setKhataNotes(e.target.value)} placeholder="e.g. 2 pota chawal, 1 box oil" />
           </div>
-          <Button className="w-full" onClick={(e) => { triggerClickSpark(e); submitKhataEntry(); }} disabled={busy}>{busy ? 'Saving…' : 'Save Entry'}</Button>
+          <ClickSpark className="w-full" disabled={busy} sparkColor={['#10b981', '#34d399']}>
+            <Button className="w-full" onClick={() => submitKhataEntry()} disabled={busy}>{busy ? 'Saving…' : 'Save Entry'}</Button>
+          </ClickSpark>
         </div>
       </Modal>
 

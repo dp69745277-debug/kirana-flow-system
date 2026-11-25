@@ -4,7 +4,7 @@ import { useApp } from '@/context/AppContext';
 import { supabase } from '@/lib/supabase';
 import {
   Button, Input, Select, Label, Card, Badge, Modal, ConfirmDialog, EmptyState, Spinner, useToast, cn,
-  AnimatedContent, triggerClickSpark,
+  AnimatedContent, ClickSpark,
 } from '@/components/ui';
 import { formatINR, formatDateTime } from '@/lib/format';
 import type { Agency, AgencyPayment, PendingHisaab, StoreUser, StaffAgencyPermission, StaffPermissions } from '@/lib/types';
@@ -285,7 +285,9 @@ export default function AgenciesScreen() {
           </div>
           <div><Label>Notes</Label><Input value={payNotes} onChange={(e) => setPayNotes(e.target.value)} /></div>
           {!isOwner && <p className="text-xs text-amber-600">Staff payments go to the owner's Pending Hisaab for approval.</p>}
-          <Button className="w-full" onClick={submitPayment} disabled={busy}>{busy ? 'Submitting…' : isOwner ? 'Record Payment' : 'Submit for Approval'}</Button>
+          <ClickSpark className="w-full" disabled={busy} sparkColor={['#10b981', '#34d399']}>
+            <Button className="w-full" onClick={submitPayment} disabled={busy}>{busy ? 'Submitting…' : isOwner ? 'Record Payment' : 'Submit for Approval'}</Button>
+          </ClickSpark>
         </div>
       </Modal>
 
@@ -302,7 +304,9 @@ export default function AgenciesScreen() {
             <div><Label>Review Note</Label><Input value={reviewNote} onChange={(e) => setReviewNote(e.target.value)} /></div>
             <div className="flex gap-2">
               <Button variant="danger" className="flex-1" onClick={() => review(false)} disabled={busy}>Reject</Button>
-              <Button className="flex-1" onClick={(e) => { triggerClickSpark(e); review(true); }} disabled={busy}>Approve</Button>
+              <ClickSpark className="flex-1" disabled={busy} sparkColor={['#10b981', '#34d399']}>
+                <Button className="w-full" onClick={() => review(true)} disabled={busy}>Approve</Button>
+              </ClickSpark>
             </div>
           </div>
         )}

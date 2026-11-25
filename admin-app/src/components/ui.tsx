@@ -1,5 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Loader2, X, AlertTriangle, CheckCircle2, Info } from 'lucide-react';
+import BlurText from './BlurText';
+import SpotlightCard from './SpotlightCard';
+import CountUp from './CountUp';
+import ClickSpark from './ClickSpark';
+
+export { BlurText, SpotlightCard, CountUp, ClickSpark };
 
 export function cn(...classes: Array<string | boolean | undefined | null>): string {
   return classes.filter(Boolean).join(' ');

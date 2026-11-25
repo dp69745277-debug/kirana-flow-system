@@ -17,7 +17,7 @@ import { useCustomerAuth } from '@/context/CustomerAuthContext';
 import { useCart } from '@/context/CartContext';
 import { formatINR } from '@/lib/format';
 import { t } from '@/lib/i18n';
-import { Button, Input, Textarea, Card, EmptyState, useToast, Spinner, cn } from '@/components/ui';
+import { Button, Input, Textarea, Card, EmptyState, useToast, Spinner, ClickSpark, cn } from '@/components/ui';
 
 interface CartScreenProps {
   onNavigateToTab: (tab: string) => void;
@@ -403,31 +403,33 @@ export function CartScreen({ onNavigateToTab, onOrderCompleted }: CartScreenProp
 
       {/* Place Order CTA Sticky Bar */}
       <div className="sticky bottom-16 md:bottom-4 z-30 pt-2">
-        <Button
-          onClick={handlePlaceOrder}
-          disabled={busy || items.length === 0}
-          className="w-full font-bold py-3.5 text-base shadow-lg shadow-emerald-700/20"
-        >
-          {busy ? (
-            <div className="flex items-center gap-2">
-              <Spinner label="" />
-              <span>Processing Order...</span>
-            </div>
-          ) : (
-            <div className="flex items-center justify-between w-full px-2">
-              <div className="text-left">
-                <span className="block text-xs font-normal text-emerald-100">
-                  {mergeWithActiveOrder && activeOpenOrder ? 'Merge into Active Order' : 'Total Payable'}
-                </span>
-                <span className="text-base font-extrabold">{formatINR(estimatedTotal)}</span>
+        <ClickSpark className="w-full" disabled={busy || items.length === 0} sparkColor={['#10b981', '#34d399']}>
+          <Button
+            onClick={handlePlaceOrder}
+            disabled={busy || items.length === 0}
+            className="w-full font-bold py-3.5 text-base shadow-lg shadow-emerald-700/20"
+          >
+            {busy ? (
+              <div className="flex items-center gap-2">
+                <Spinner label="" />
+                <span>Processing Order...</span>
               </div>
-              <div className="flex items-center gap-1.5 font-extrabold">
-                <span>{mergeWithActiveOrder && activeOpenOrder ? 'Update Order' : t('placeOrder', lang)}</span>
-                <ArrowRight size={18} />
+            ) : (
+              <div className="flex items-center justify-between w-full px-2">
+                <div className="text-left">
+                  <span className="block text-xs font-normal text-emerald-100">
+                    {mergeWithActiveOrder && activeOpenOrder ? 'Merge into Active Order' : 'Total Payable'}
+                  </span>
+                  <span className="text-base font-extrabold">{formatINR(estimatedTotal)}</span>
+                </div>
+                <div className="flex items-center gap-1.5 font-extrabold">
+                  <span>{mergeWithActiveOrder && activeOpenOrder ? 'Update Order' : t('placeOrder', lang)}</span>
+                  <ArrowRight size={18} />
+                </div>
               </div>
-            </div>
-          )}
-        </Button>
+            )}
+          </Button>
+        </ClickSpark>
       </div>
     </div>
   );

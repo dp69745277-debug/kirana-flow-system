@@ -31,7 +31,7 @@ import { supabase } from '@/lib/supabase';
 import { formatINR, formatDateTime, upiPayLink, telLink, waLink } from '@/lib/format';
 import { t } from '@/lib/i18n';
 import { generateCustomerKhataPDF } from '@/lib/pdf';
-import { Button, Card, Badge, Modal, EmptyState, Spinner, useToast, cn } from '@/components/ui';
+import { Button, Card, Badge, Modal, EmptyState, Spinner, useToast, CountUp, ClickSpark, cn } from '@/components/ui';
 import type {
   KhataTransaction,
   Order,
@@ -551,23 +551,29 @@ export function KhataScreen({ onOpenOrderFromKhata }: KhataScreenProps) {
             )}
 
             <div className="pt-2">
-              <Button
-                onClick={handleProceedPayment}
+              <ClickSpark
+                className="w-full"
                 disabled={initiatingPay || payAmount <= 0 || payAmount > balance}
-                className="w-full py-3.5 font-extrabold text-base shadow-lg shadow-emerald-600/20"
+                sparkColor={['#10b981', '#34d399']}
               >
-                {initiatingPay ? (
-                  <div className="flex items-center gap-2">
-                    <Spinner label="" />
-                    <span>Connecting Payment Gateway...</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-center gap-2">
-                    <Zap size={18} />
-                    <span>Proceed to Pay {formatINR(payAmount)}</span>
-                  </div>
-                )}
-              </Button>
+                <Button
+                  onClick={handleProceedPayment}
+                  disabled={initiatingPay || payAmount <= 0 || payAmount > balance}
+                  className="w-full py-3.5 font-extrabold text-base shadow-lg shadow-emerald-600/20"
+                >
+                  {initiatingPay ? (
+                    <div className="flex items-center gap-2">
+                      <Spinner label="" />
+                      <span>Connecting Payment Gateway...</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center gap-2">
+                      <Zap size={18} />
+                      <span>Proceed to Pay {formatINR(payAmount)}</span>
+                    </div>
+                  )}
+                </Button>
+              </ClickSpark>
             </div>
           </div>
         </Modal>
@@ -796,7 +802,14 @@ export function KhataScreen({ onOpenOrderFromKhata }: KhataScreenProps) {
           </div>
 
           <p className="text-3xl sm:text-4xl font-black mt-2 tracking-tight">
-            {formatINR(balance)}
+            <CountUp
+              to={balance}
+              prefix="₹"
+              decimals={Number.isInteger(balance) ? 0 : 2}
+              locale="en-IN"
+              duration={0.85}
+              trigger="load"
+            />
           </p>
 
           {isSettled ? (
@@ -813,12 +826,28 @@ export function KhataScreen({ onOpenOrderFromKhata }: KhataScreenProps) {
           <div className="grid grid-cols-2 gap-2 mt-4 pt-3 border-t border-white/10 text-xs">
             <div>
               <span className="text-slate-400 block text-[11px]">{t('billedThisMonth', lang)}</span>
-              <span className="font-extrabold text-white text-sm">{formatINR(monthlyStats.billed)}</span>
+              <span className="font-extrabold text-white text-sm">
+                <CountUp
+                  to={monthlyStats.billed}
+                  prefix="₹"
+                  decimals={Number.isInteger(monthlyStats.billed) ? 0 : 2}
+                  locale="en-IN"
+                  duration={0.85}
+                  trigger="load"
+                />
+              </span>
             </div>
             <div>
               <span className="text-slate-400 block text-[11px]">{t('paidThisMonth', lang)}</span>
               <span className="font-extrabold text-emerald-300 text-sm">
-                {formatINR(monthlyStats.paid)}
+                <CountUp
+                  to={monthlyStats.paid}
+                  prefix="₹"
+                  decimals={Number.isInteger(monthlyStats.paid) ? 0 : 2}
+                  locale="en-IN"
+                  duration={0.85}
+                  trigger="load"
+                />
               </span>
             </div>
           </div>

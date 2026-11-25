@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from 'react';
 import { X, AlertTriangle, Loader2 } from 'lucide-react';
+import BlurText from './BlurText';
+import SpotlightCard from './SpotlightCard';
+import CountUp from './CountUp';
+import ClickSpark from './ClickSpark';
+
+export { BlurText, SpotlightCard, CountUp, ClickSpark };
 
 export function cn(...parts: Array<string | false | null | undefined>): string {
   return parts.filter(Boolean).join(' ');

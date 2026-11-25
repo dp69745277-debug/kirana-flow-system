@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Store, Phone, Lock, ArrowRight, ShieldCheck } from 'lucide-react';
 import { useCustomerAuth } from '@/context/CustomerAuthContext';
-import { Button, Input, Label, Card, useToast, Spinner } from '@/components/ui';
+import { Button, Input, Label, Card, useToast, Spinner, BlurText } from '@/components/ui';
 
 export function AuthScreen() {
   const { login } = useCustomerAuth();
@@ -41,9 +41,18 @@ export function AuthScreen() {
           <div className="mx-auto w-16 h-16 rounded-3xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center shadow-lg shadow-emerald-600/30">
             <Store size={32} />
           </div>
-          <h1 className="mt-4 text-2xl font-extrabold text-slate-900 tracking-tight">
-            Kirana Wholesale B2B
-          </h1>
+          <BlurText
+            as="h1"
+            text="Kirana Wholesale B2B"
+            delay={80}
+            stepDuration={0.28}
+            blur={6}
+            distance={16}
+            animateBy="words"
+            direction="top"
+            trigger="load"
+            className="mt-4 text-2xl font-extrabold text-slate-900 tracking-tight justify-center"
+          />
           <p className="text-sm text-slate-500 mt-1 font-medium">
             Retailer Portal • Direct Wholesaler Ordering & Khata
           </p>

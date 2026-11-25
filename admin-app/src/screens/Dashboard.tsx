@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import type { Store as StoreModel, SaasPayment, PlatformSettings } from '@/lib/types';
-import { Card, Badge, Button, useToast } from '@/components/ui';
+import { Card, Badge, Button, SpotlightCard, CountUp, useToast } from '@/components/ui';
 import { formatCurrency, formatDate, formatDateTime, formatExpiryCountdown } from '@/lib/format';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell, PieChart, Pie } from 'recharts';
 
@@ -234,8 +234,11 @@ export const DashboardScreen: React.FC<DashboardProps> = ({
       {/* Top 4 KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Registered Stores */}
-        <Card
-          className="p-5 cursor-pointer hover:border-slate-300 dark:hover:border-slate-700 transition-all hover:shadow-md"
+        <SpotlightCard
+          spotlightColor="#64748b"
+          intensity={0.18}
+          borderGlow={0.35}
+          className="p-5 cursor-pointer hover:border-slate-300 dark:hover:border-slate-700"
           onClick={() => onNavigateToStores()}
         >
           <div className="flex items-center justify-between">
@@ -248,7 +251,7 @@ export const DashboardScreen: React.FC<DashboardProps> = ({
           </div>
           <div className="mt-3 flex items-baseline gap-2">
             <span className="text-3xl font-extrabold tracking-tight tabular-nums text-slate-900 dark:text-white">
-              {totalStores}
+              <CountUp to={totalStores} locale="en-IN" duration={0.85} trigger="load" />
             </span>
             <span className="text-xs text-slate-400">stores</span>
           </div>
@@ -263,11 +266,14 @@ export const DashboardScreen: React.FC<DashboardProps> = ({
               Mix: {mixCount}
             </Badge>
           </div>
-        </Card>
+        </SpotlightCard>
 
         {/* Active Paid Stores & MRR */}
-        <Card
-          className="p-5 cursor-pointer hover:border-emerald-300 dark:hover:border-emerald-700 transition-all hover:shadow-md border-emerald-500/20"
+        <SpotlightCard
+          spotlightColor="#10b981"
+          intensity={0.22}
+          borderGlow={0.45}
+          className="p-5 cursor-pointer hover:border-emerald-300 dark:hover:border-emerald-700 border-emerald-500/20"
           onClick={() => onNavigateToStores({ status: 'active' })}
         >
           <div className="flex items-center justify-between">
@@ -280,7 +286,7 @@ export const DashboardScreen: React.FC<DashboardProps> = ({
           </div>
           <div className="mt-3 flex items-baseline gap-2">
             <span className="text-3xl font-extrabold tracking-tight tabular-nums text-emerald-600 dark:text-emerald-400">
-              {formatCurrency(mrr)}
+              <CountUp to={mrr} prefix="₹" locale="en-IN" duration={0.85} trigger="load" />
             </span>
             <span className="text-xs text-slate-400">/mo</span>
           </div>
@@ -290,11 +296,14 @@ export const DashboardScreen: React.FC<DashboardProps> = ({
               View <ChevronRight className="w-3 h-3" />
             </span>
           </div>
-        </Card>
+        </SpotlightCard>
 
         {/* Active 3-Day Demos & Trials */}
-        <Card
-          className="p-5 cursor-pointer hover:border-blue-300 dark:hover:border-blue-700 transition-all hover:shadow-md border-blue-500/20"
+        <SpotlightCard
+          spotlightColor="#3b82f6"
+          intensity={0.2}
+          borderGlow={0.4}
+          className="p-5 cursor-pointer hover:border-blue-300 dark:hover:border-blue-700 border-blue-500/20"
           onClick={() => onNavigateToStores({ status: 'trial' })}
         >
           <div className="flex items-center justify-between">
@@ -307,7 +316,7 @@ export const DashboardScreen: React.FC<DashboardProps> = ({
           </div>
           <div className="mt-3 flex items-baseline gap-2">
             <span className="text-3xl font-extrabold tracking-tight tabular-nums text-blue-600 dark:text-blue-400">
-              {trialStores.length}
+              <CountUp to={trialStores.length} locale="en-IN" duration={0.85} trigger="load" />
             </span>
             <span className="text-xs text-slate-400">demos</span>
           </div>
@@ -324,11 +333,14 @@ export const DashboardScreen: React.FC<DashboardProps> = ({
               Filter <ChevronRight className="w-3 h-3" />
             </span>
           </div>
-        </Card>
+        </SpotlightCard>
 
         {/* Expired / Suspended Stores */}
-        <Card
-          className="p-5 cursor-pointer hover:border-rose-300 dark:hover:border-rose-700 transition-all hover:shadow-md border-rose-500/20"
+        <SpotlightCard
+          spotlightColor="#f43f5e"
+          intensity={0.2}
+          borderGlow={0.4}
+          className="p-5 cursor-pointer hover:border-rose-300 dark:hover:border-rose-700 border-rose-500/20"
           onClick={() => onNavigateToStores({ status: 'expired' })}
         >
           <div className="flex items-center justify-between">
@@ -341,7 +353,7 @@ export const DashboardScreen: React.FC<DashboardProps> = ({
           </div>
           <div className="mt-3 flex items-baseline gap-2">
             <span className="text-3xl font-extrabold tracking-tight tabular-nums text-rose-600 dark:text-rose-400">
-              {expiredOrSuspended.length}
+              <CountUp to={expiredOrSuspended.length} locale="en-IN" duration={0.85} trigger="load" />
             </span>
             <span className="text-xs text-slate-400">stores</span>
           </div>
@@ -351,7 +363,7 @@ export const DashboardScreen: React.FC<DashboardProps> = ({
               Review <ChevronRight className="w-3 h-3" />
             </span>
           </div>
-        </Card>
+        </SpotlightCard>
       </div>
 
       {/* Main Grid: Quick Attention Lists & Charts */}
